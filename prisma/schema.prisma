@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  journals      Journal[]
+  experiments   Experiment[]
+  metrics       Metric[]
+}
+
+model Journal {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model Experiment {
+  id            String    @id @default(cuid())
+  title         String
+  description   String
+  methodology   String
+  status        String
+  results       String?
+  attachments   Json?     // For file metadata
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Metric {
+  id            String    @id @default(cuid())
+  name          String
+  type          String    // numeric, boolean, scale
+  value         Json      // For flexible value storage
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+} 
